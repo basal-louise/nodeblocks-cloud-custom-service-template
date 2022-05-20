@@ -24,7 +24,6 @@
     "node-fetch": "^3.2.4"
   },
   "devDependencies": {
-    "dotenv-cli": "^5.1.0",
-    "npm": "^8.10.0"
+    "dotenv-cli": "^5.1.0"
   }
 }
