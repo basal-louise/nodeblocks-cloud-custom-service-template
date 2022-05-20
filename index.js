@@ -1,12 +1,10 @@
-const path = require("path");
-const express = require("express");
-const app = express();
-const got = require("got");
+import path from 'path'
+import express from 'express'
+import got from 'got'
+const app = express()
 
-
-const utilities = require("./utilities");
-const middleware = require("./middleware");
-const package = require('./package.json')
+import * as utilities from './utilities.js'
+import * as middleware from './middleware.js'
 
 // the computer port that
 const PORT = utilities.getEnvironmentVariable("PORT", 3000);
@@ -18,7 +16,7 @@ const AUTH_ENDPOINT = utilities.getEnvironmentVariable("AUTH_ENDPOINT", "http://
 app.use(middleware.authenticationCheck);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join('./', "public")));
 
 //api document
 //https://api.artic.edu/docs/#quick-start
@@ -26,7 +24,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/ping", (req, res) => {
   //return some basic information to make sure the server is running
-  res.send({ version: package.version, name: package.name });
+  res.send({ version: '1.0.0', name: 'service-name' });
 });
 
 app.get("/users", (req, res) => {

@@ -1,6 +1,6 @@
-const assert = require('assert');
+import assert from 'assert';
 
-function getImageUrl(imageId, size){
+export function getImageUrl(imageId, size){
     const _size = {
         "full": 848,
         "small": 150
@@ -8,18 +8,13 @@ function getImageUrl(imageId, size){
     return `https://www.artic.edu/iiif/2/${image_id}/full/${_size[size]},/0/default.jpg`
 }
 
-function log(){
+export function log(){
     console.log('🪵 ', ...arguments)
 }
 
-function getEnvironmentVariable(name, defaultValue) {
+export function getEnvironmentVariable(name, defaultValue) {
     const value = process.env[name] || defaultValue;
     assert(value, `${name} not set`);
     return value;
   }
 
-module.exports = {
-    getImageUrl,
-    getEnvironmentVariable,
-    log
-}
