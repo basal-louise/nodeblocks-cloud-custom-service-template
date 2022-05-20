@@ -1,10 +1,11 @@
 const path = require("path");
 const express = require("express");
 const app = express();
+const got = require("got");
+
 
 const utilities = require("./utilities");
 const middleware = require("./middleware");
-const fetch = require("node-fetch");
 const package = require('./package.json')
 
 // the computer port that
@@ -40,30 +41,22 @@ app.get("/users/:id", (req, res) => {
 
 //Get Artworks
 //https://api.artic.edu/api/v1/artworks/75644?fields=id,title,image_id,alt_image_ids
-app.get("/artwork", (req, appResp) => {
+app.get("/artwork", async (req, appResp) => {
   //List all artwork
   const allArtworkUrl = `https://api.artic.edu/api/v1/artworks`;
   //Fetch a list of all the artwork
-  fetch(allArtworkUrl).then((resp) => {
-    resp.json().then((data) => {
-      //return the json to the requestor
-      appResp.send(data);
-    });
-  });
+  const { data } = await got.get(allArtworkUrl);
+  appResp.send(data);
 });
 
-app.get("/artwork/:id", (req, appResp) => {
+app.get("/artwork/:id", async (req, appResp) => {
   //Single Artwork
   // Pass the requested url to the 3rd party api
   // for example: http://localhost:3000/artwork/75644 -> req.params.id would equal 75644
   const singleArtworkUrl = `https://api.artic.edu/api/v1/artworks/${req.params.id}?fields=id,title,image_id,alt_image_ids`;
   // Request the single artwork JSON
-  fetch(singleArtworkUrl).then((resp) => {
-    resp.json().then((data) => {
-      //return the json to the requestor
-      appResp.send(data);
-    });
-  });
+  const { data } = await got.get(singleArtworkUrl);
+  appResp.send(data);
 });
 
 app.listen(PORT, () => {
