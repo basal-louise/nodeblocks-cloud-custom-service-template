@@ -1,25 +1,24 @@
 const path = require("path");
 const express = require("express");
 const app = express();
-const port = process.env.PORT;
+
 const utilities = require("./utilities");
 const middleware = require("./middleware");
 const fetch = require("node-fetch");
 const package = require('./package.json')
 
-utilities.getEnvironmentVariable("PORT", 3000);
-utilities.getEnvironmentVariable("USER_ENDPOINT", "http://localhost:3000");
-utilities.getEnvironmentVariable("AUTH_ENDPOINT", "http://localhost:3001");
+// the computer port that
+const PORT = utilities.getEnvironmentVariable("PORT", 3000);
+//The url of the user service
+const USER_ENDPOINT = utilities.getEnvironmentVariable("USER_ENDPOINT", "http://localhost:3000");
+//the url of the authentication service
+const AUTH_ENDPOINT = utilities.getEnvironmentVariable("AUTH_ENDPOINT", "http://localhost:3001");
 
 app.use(middleware.authenticationCheck);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
-//The url of the user service
-const USER_ENDPOINT = process.env.USER_ENDPOINT;
-//the url of the authentication service
-const AUTH_ENDPOINT = process.env.AUTH_ENDPOINT;
 //api document
 //https://api.artic.edu/docs/#quick-start
 //https://iiif.io/api/image/2.0/#size
@@ -67,6 +66,6 @@ app.get("/artwork/:id", (req, appResp) => {
   });
 });
 
-app.listen(port, () => {
-  utilities.log(`Example app listening on port ${port}`);
+app.listen(PORT, () => {
+  utilities.log(`Example app listening on port ${PORT}`);
 });
