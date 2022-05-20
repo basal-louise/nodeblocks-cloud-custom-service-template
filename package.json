@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "prestart": "npm install",
     "start:dev": "dotenv node index.js",
     "start": "node index.js"
   },
