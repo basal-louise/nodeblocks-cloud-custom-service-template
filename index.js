@@ -43,8 +43,16 @@ app.get("/artwork", async (req, appResp) => {
   //List all artwork
   const allArtworkUrl = `https://api.artic.edu/api/v1/artworks`;
   //Fetch a list of all the artwork
-  const { data } = await got.get(allArtworkUrl);
-  appResp.send(data);
+  try {
+    const data = await got({
+      url: allArtworkUrl
+    }).json()
+    utilities.log('data', data)
+    appResp.send(data);
+  } catch(err) {
+    utilities.log('Error', err)
+    appResp.send(err.message);
+  }
 });
 
 app.get("/artwork/:id", async (req, appResp) => {
@@ -52,9 +60,18 @@ app.get("/artwork/:id", async (req, appResp) => {
   // Pass the requested url to the 3rd party api
   // for example: http://localhost:3000/artwork/75644 -> req.params.id would equal 75644
   const singleArtworkUrl = `https://api.artic.edu/api/v1/artworks/${req.params.id}?fields=id,title,image_id,alt_image_ids`;
+  
   // Request the single artwork JSON
-  const { data } = await got.get(singleArtworkUrl);
-  appResp.send(data);
+  try {
+    const data = await got({
+      url: singleArtworkUrl
+    }).json()
+    utilities.log('data', data)
+    appResp.send(data);
+  } catch(err) {
+    utilities.log('Error', err)
+    appResp.send(err.message);
+  }
 });
 
 app.listen(PORT, () => {
