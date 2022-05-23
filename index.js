@@ -91,6 +91,7 @@ async function getUserRoute(logger, { headers, body, query, params, reqInfo, raw
     url: USER_ENDPOINT + `/users/${params.id}`
   }
   logger.info('requestInfo', requestInfo)
+  logger.info('headers', headers)
   try {
     const getUser = await got(requestInfo).json();
     // Onces the data is found, its "logged" to the console
