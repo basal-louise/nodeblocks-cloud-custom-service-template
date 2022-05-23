@@ -1,14 +1,20 @@
 /**========================================================================
  *                           Libraries
  *========================================================================**/
-import express from "express";
+import _ from "lodash";
+import { util, adapter, app as nodeblocks } from "@basaldev/backend-sdk";
 import got from "got";
-const app = express();
+
+// Config
+const { StatusCodes } = util;
+const SERVICE_NAME = "NODEBLOCKS_CUSTOM_SERVICE";
+const VERSION_INFO = "1.0.0";
+
+const app = nodeblocks.createNodeblocksApp();
 /**============================================
  *               Helper Functions
  *=============================================**/
 import * as utilities from "./utilities.js";
-import * as middleware from "./middleware.js";
 /**============================================
  *               Environment Variables
  *=============================================**/
@@ -25,64 +31,112 @@ const USER_ENDPOINT = utilities.getEnvironmentVariable(
 //   "DEFAULT_VALUE_FOR_YOUR_NEW_VAR"
 // );
 
-/**========================================================================
- *                           Express Middleware
- *========================================================================**/
-// Documentation: https://expressjs.com/en/guide/using-middleware.html
-app.use(express.json());
-// express.json() is a built-in middleware function in Express. 
-// This method is used to parse the incoming requests with JSON payloads and is based upon the bodyparser.
-app.use(express.urlencoded({ extended: false }));
-// The express.urlencoded() function is a built-in middleware function in Express. 
-// It parses incoming requests with urlencoded payloads and is based on body-parser.
+const ROUTES = [
+  {
+    path: "/ping",
+    method: "get",
+    handler: pingRoute,
+    validators: [],
+  },
+  {
+    path: "/users/:id",
+    method: "get",
+    handler: getUserRoute,
+    validators: [],
+  },
+  {
+    path: "/artwork",
+    method: "get",
+    handler: getAllArtwork,
+    validators: [],
+  },
+  {
+    path: "/artwork/:id",
+    method: "get",
+    handler: getSingleArtwork,
+    validators: [],
+  },
+];
+
+app.use(
+  util.createRoutes(ROUTES, {
+    // 👇 this is required to run the service, should probably not be and
+    // should be logOptions
+    logOpts: {
+      version: VERSION_INFO,
+      name: SERVICE_NAME,
+    },
+  })
+);
 
 /**========================================================================
- *                           Routes
+ *                           Route Handlers
  *========================================================================**/
-app.get("/ping", (req, res) => {
+
+function pingRoute(logger, { header, body, query, params, reqInfo, raw}) {
   // Ping is a standard route in most APIs
   // its main purpose is an easy way to check the service is running and return version information
-  res.send({ version: "1.0.0", name: "service-name" });
-});
+  logger.info("Ping Handler", reqInfo);
+  return {
+    status: StatusCodes.OK,
+    data: { version: VERSION_INFO, name: SERVICE_NAME },
+  };
+}
+async function getUserRoute(logger, { headers, body, query, params, reqInfo, raw }) {
+  try {
+    const getUser = await got({
+      headers,
+      url: USER_ENDPOINT + `/users/${params.id}`
+    }).json();
+    // Onces the data is found, its "logged" to the console
+    // Logs can be viewed by clicking the Three dots and then "View Logs" in Nodeblocks Cloud Studio
+    return {
+      status: StatusCodes.OK,
+      data: getUser
+    };
+  } catch (error) {
+    // All the Errors will be logged as well in the same location
+    logger.error(error)
+    // A simple error message will be returned to the requestor
+    return {
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      data: error.message
+    };
+  }
+}
 
-// This route includes a authenticationCheck middleware that runs before the routes function
-// this authenticationCheck will if the user is allowed to access this route and the data on it
-app.get("/users/:userId", middleware.authenticationCheck, async (req, res) => {
-  //get current users information
-  res.send("user");
-});
-
-/**============================================
- *               External APIs
- *=============================================**/
-// Documentation: https://api.artic.edu/docs/#quick-start
-//This service example uses the Art Institute of Chicago's API as an example of a 3rd party api you can call
-
-app.get("/artwork", async (req, appResp) => {
+async function getAllArtwork(logger, { header, body, query, params, reqInfo, raw}) {
   //this route requests all artwork from the API
   const allArtworkUrl = `https://api.artic.edu/api/v1/artworks`;
   // the request is wrapped in a try statement to check all errors that might happen
   try {
-    const data = await got({
+    const artwork = await got({
       url: allArtworkUrl,
     }).json();
     // Onces the data is found, its "logged" to the console
     // Logs can be viewed by clicking the Three dots and then "View Logs" in Nodeblocks Cloud Studio
-    utilities.log("allArtworkUrl", data);
-    appResp.send(data);
-  } catch (err) {
+    logger.info("Get All Artwork: ", artwork.data.length);
+    return {
+      status: StatusCodes.OK,
+      data: artwork
+    };
+  } catch (error) {
     // All the Errors will be logged as well in the same location
-    utilities.log("🔥 Error", err);
+    logger.error(error)
     // A simple error message will be returned to the requestor
-    appResp.send(err.message);
+    return {
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      data: err.message
+    };
   }
-});
 
-app.get("/artwork/:id", async (req, appResp) => {
+}
+
+async function getSingleArtwork(logger, { header, body, query, params, reqInfo, raw}) {
   // this route requests a single artwork from the API
   // the :id in the route is replaced with the last string in the request url
   // for example: http://localhost:3000/artwork/75644 -> :id AKA req.params.id would equal 75644
-  const singleArtworkUrl = `https://api.artic.edu/api/v1/artworks/${req.params.id}?fields=id,title,image_id`;
+  const singleArtworkUrl = `https://api.artic.edu/api/v1/artworks/${params.id}?fields=id,title,image_id`;
 
   // the request is wrapped in a try statement to check all errors that might happen
   // and return then to the Nodeblock's Cloud Studio "View logs" page
@@ -94,22 +148,30 @@ app.get("/artwork/:id", async (req, appResp) => {
       id: data.id,
       title: data.title,
       images: {
-        'full': utilities.getImageUrl(data.image_id, 'full'),
-        'small': utilities.getImageUrl(data.image_id, 'small')
-      }
-    }
-    
+        full: utilities.getImageUrl(data.image_id, "full"),
+        small: utilities.getImageUrl(data.image_id, "small"),
+      },
+    };
+
     // Onces the data is found, its "logged" to the console
     // Logs can be viewed by clicking the Three dots and then "View Logs" in Nodeblocks Cloud Studio
-    utilities.log("singleArtworkUrl", artInformation);
-    appResp.send(artInformation);
+    logger.info("singleArtworkUrl", artInformation);
+    return {
+      status: StatusCodes.OK,
+      data: artInformation
+    };
   } catch (err) {
     // All the Errors will be logged as well in the same location
-    utilities.log("🔥 Error", err);
+    logger.info("🔥 Error", err);
     // A simple error message will be returned to the requestor
-    appResp.send(err.message);
+    return {
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      data: err.message
+    };
   }
-});
+}
+
+
 
 /**============================================
  *               Start the service
