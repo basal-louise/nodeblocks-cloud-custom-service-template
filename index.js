@@ -83,15 +83,15 @@ function pingRoute(logger, { headers, body, query, params, reqInfo, raw}) {
   };
 }
 async function getUserRoute(logger, { headers, body, query, params, reqInfo, raw }) {
+  logger.info('params', params)
   const requestInfo = {
     headers: {
-      'x-nb-fingerprint': headers['x-nb-token'],
+      'x-nb-fingerprint': headers['x-nb-fingerprint'],
       'x-nb-token': headers['x-nb-token']
     },
     url: USER_ENDPOINT + `/users/${params.id}`
   }
   logger.info('requestInfo', requestInfo)
-  logger.info('headers', headers)
   try {
     const getUser = await got(requestInfo).json();
     // Onces the data is found, its "logged" to the console
