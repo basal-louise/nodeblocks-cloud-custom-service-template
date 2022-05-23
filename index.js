@@ -73,7 +73,7 @@ app.use(
  *                           Route Handlers
  *========================================================================**/
 
-function pingRoute(logger, { header, body, query, params, reqInfo, raw}) {
+function pingRoute(logger, { headers, body, query, params, reqInfo, raw}) {
   // Ping is a standard route in most APIs
   // its main purpose is an easy way to check the service is running and return version information
   logger.info("Ping Handler", reqInfo);
@@ -83,11 +83,16 @@ function pingRoute(logger, { header, body, query, params, reqInfo, raw}) {
   };
 }
 async function getUserRoute(logger, { headers, body, query, params, reqInfo, raw }) {
+  const requestInfo = {
+    headers: {
+      'x-nb-fingerprint': headers['x-nb-token'],
+      'x-nb-token': headers['x-nb-token']
+    },
+    url: USER_ENDPOINT + `/users/${params.id}`
+  }
+  logger.info('requestInfo', requestInfo)
   try {
-    const getUser = await got({
-      headers,
-      url: USER_ENDPOINT + `/users/${params.id}`
-    }).json();
+    const getUser = await got(requestInfo).json();
     // Onces the data is found, its "logged" to the console
     // Logs can be viewed by clicking the Three dots and then "View Logs" in Nodeblocks Cloud Studio
     return {
@@ -105,7 +110,7 @@ async function getUserRoute(logger, { headers, body, query, params, reqInfo, raw
   }
 }
 
-async function getAllArtwork(logger, { header, body, query, params, reqInfo, raw}) {
+async function getAllArtwork(logger, { headers, body, query, params, reqInfo, raw}) {
   //this route requests all artwork from the API
   const allArtworkUrl = `https://api.artic.edu/api/v1/artworks`;
   // the request is wrapped in a try statement to check all errors that might happen
@@ -132,7 +137,7 @@ async function getAllArtwork(logger, { header, body, query, params, reqInfo, raw
 
 }
 
-async function getSingleArtwork(logger, { header, body, query, params, reqInfo, raw}) {
+async function getSingleArtwork(logger, { headers, body, query, params, reqInfo, raw}) {
   // this route requests a single artwork from the API
   // the :id in the route is replaced with the last string in the request url
   // for example: http://localhost:3000/artwork/75644 -> :id AKA req.params.id would equal 75644
