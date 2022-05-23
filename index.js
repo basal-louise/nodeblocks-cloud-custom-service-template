@@ -47,7 +47,7 @@ app.get("/ping", (req, res) => {
 
 // This route includes a authenticationCheck middleware that runs before the routes function
 // this authenticationCheck will if the user is allowed to access this route and the data on it
-app.get("/users/profile", middleware.authenticationCheck, (req, res) => {
+app.get("/users/:userId", middleware.authenticationCheck, async (req, res) => {
   //get current users information
   res.send("user");
 });
@@ -79,20 +79,30 @@ app.get("/artwork", async (req, appResp) => {
 });
 
 app.get("/artwork/:id", async (req, appResp) => {
-  //this route requests a single artwork from the API
+  // this route requests a single artwork from the API
   // the :id in the route is replaced with the last string in the request url
   // for example: http://localhost:3000/artwork/75644 -> :id AKA req.params.id would equal 75644
-  const singleArtworkUrl = `https://api.artic.edu/api/v1/artworks/${req.params.id}?fields=id,title,image_id,alt_image_ids`;
+  const singleArtworkUrl = `https://api.artic.edu/api/v1/artworks/${req.params.id}?fields=id,title,image_id`;
 
   // the request is wrapped in a try statement to check all errors that might happen
+  // and return then to the Nodeblock's Cloud Studio "View logs" page
   try {
-    const data = await got({
+    const { data } = await got({
       url: singleArtworkUrl,
     }).json();
+    const artInformation = {
+      id: data.id,
+      title: data.title,
+      images: {
+        'full': utilities.getImageUrl(data.image_id, 'full'),
+        'small': utilities.getImageUrl(data.image_id, 'small')
+      }
+    }
+    
     // Onces the data is found, its "logged" to the console
     // Logs can be viewed by clicking the Three dots and then "View Logs" in Nodeblocks Cloud Studio
-    utilities.log("singleArtworkUrl", data);
-    appResp.send(data);
+    utilities.log("singleArtworkUrl", artInformation);
+    appResp.send(artInformation);
   } catch (err) {
     // All the Errors will be logged as well in the same location
     utilities.log("🔥 Error", err);
@@ -104,7 +114,7 @@ app.get("/artwork/:id", async (req, appResp) => {
 /**============================================
  *               Start the service
  *=============================================**/
-// this function is what starts the app
+// this function starts the app
 app.listen(PORT, () => {
   // if you want to run a function every time its starts
   // put that function inside here
