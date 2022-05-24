@@ -155,6 +155,7 @@ async function getSingleArtwork(
   logger,
   { headers, body, query, params, reqInfo, raw }
 ) {
+  logger.info("getSingleArtwork", params);
   // this route requests a single artwork from the API
   // the :id in the route is replaced with the last string in the request url
   // for example: http://localhost:3000/artwork/75644 -> :id AKA req.params.id would equal 75644
@@ -170,8 +171,8 @@ async function getSingleArtwork(
       id: data.id,
       title: data.title,
       images: {
-        full: `https://www.artic.edu/iiif/2/data.image_id/full/848,/0/default.jpg`,
-        small: `https://www.artic.edu/iiif/2/data.image_id/full/150,/0/default.jpg`,
+        full: `https://www.artic.edu/iiif/2/${data.image_id}/full/848,/0/default.jpg`,
+        small: `https://www.artic.edu/iiif/2/${data.image_id}/full/150,/0/default.jpg`,
       },
     };
 
