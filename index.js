@@ -11,23 +11,17 @@ const SERVICE_NAME = "NODEBLOCKS_CUSTOM_SERVICE";
 const VERSION_INFO = "1.0.0";
 
 /**============================================
- *               Helper Functions
+ *              Helper Functions
  *=============================================**/
-// get an Environment Variable and if its not set return the default value
-export function getEnvironmentVariable(name, defaultValue) {
-  const value = process.env[name] || defaultValue;
-  assert(value, `${name} not set`);
-  return value;
-}
-
+ import * as utilities from "./utilities.js";
 /**============================================
  *               Environment Variables
  *=============================================**/
 // the port the service will run on, node-block default is 8081
-const PORT = getEnvironmentVariable("PORT", 8081);
+const PORT = utilities.getEnvironmentVariable("PORT", 8081);
 
 // You can use this helper function to call any new environment variables and include a default value
-// const MONGO_DB = getEnvironmentVariable(
+// const MONGO_DB = utilities.getEnvironmentVariable(
 //   "MONGO_DB",
 //   "DEFAULT_MONGO_DB_CONNECTION_STRING"
 // );
@@ -206,5 +200,5 @@ async function getSingleArtwork(
 app.listen(PORT, () => {
   // if you want to run a function every time its starts
   // put that function inside here
-  utilities.log(`Example app listening on port ${PORT}`);
+  console.log(`Example app listening on port ${PORT}`);
 });
