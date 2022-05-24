@@ -24,15 +24,10 @@ export function getEnvironmentVariable(name, defaultValue) {
  *               Environment Variables
  *=============================================**/
 // the port the service will run on, node-block default is 8081
-const PORT = utilities.getEnvironmentVariable("PORT", 8081);
-//The url of the user service
-const USER_ENDPOINT = utilities.getEnvironmentVariable(
-  "USER_ENDPOINT",
-  "http://localhost:3000"
-);
+const PORT = getEnvironmentVariable("PORT", 8081);
 
 // You can use this helper function to call any new environment variables and include a default value
-// const MONGO_DB = utilities.getEnvironmentVariable(
+// const MONGO_DB = getEnvironmentVariable(
 //   "MONGO_DB",
 //   "DEFAULT_MONGO_DB_CONNECTION_STRING"
 // );
