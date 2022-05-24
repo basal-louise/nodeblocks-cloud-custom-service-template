@@ -2,7 +2,7 @@
  *                           Libraries
  *========================================================================**/
 import _ from "lodash";
-import { util, app as nodeblocks } from "@basaldev/backend-sdk";
+import { util, app as nodeblocks, mongo } from "@basaldev/backend-sdk";
 import got from "got";
 
 // Config
@@ -10,12 +10,16 @@ const { StatusCodes } = util;
 const SERVICE_NAME = "NODEBLOCKS_CUSTOM_SERVICE";
 const VERSION_INFO = "1.0.0";
 
-const app = nodeblocks.createNodeblocksApp();
 /**============================================
  *               Helper Functions
  *=============================================**/
-import * as utilities from "./utilities.js";
-import * as validators from "./validators.js";
+// get an Environment Variable and if its not set return the default value
+export function getEnvironmentVariable(name, defaultValue) {
+  const value = process.env[name] || defaultValue;
+  assert(value, `${name} not set`);
+  return value;
+}
+
 /**============================================
  *               Environment Variables
  *=============================================**/
@@ -26,12 +30,24 @@ const USER_ENDPOINT = utilities.getEnvironmentVariable(
   "USER_ENDPOINT",
   "http://localhost:3000"
 );
+
 // You can use this helper function to call any new environment variables and include a default value
-// const YOUR_NEW_VAR = utilities.getEnvironmentVariable(
-//   "YOUR_NEW_VAR",
-//   "DEFAULT_VALUE_FOR_YOUR_NEW_VAR"
+// const MONGO_DB = utilities.getEnvironmentVariable(
+//   "MONGO_DB",
+//   "DEFAULT_MONGO_DB_CONNECTION_STRING"
 // );
 
+const app = nodeblocks.createNodeblocksApp();
+//const databaseClient = mongo.mongoClient(MONGO_DB)
+/**============================================
+ *               validators
+ *=============================================**/
+import * as validators from "./validators.js";
+/**============================================
+ *               Routes
+ *=============================================**/
+// this arraay stores all the routes for your custom service
+// you can
 const ROUTES = [
   {
     path: "/ping",
@@ -40,9 +56,13 @@ const ROUTES = [
     validators: [],
   },
   {
-    path: "/users/:id",
-    method: "get",
-    handler: getUserRoute,
+    path: "/purchase",
+    //method can be  'get' | 'post' | 'delete' | 'patch'
+    method: "post",
+    handler: createArtworkPurchase,
+    //This route includes a validator, easy to use function to help protect routes
+    // you can have as many as you like
+    // authenticationCheck is in validators.js
     validators: [validators.authenticationCheck],
   },
   {
@@ -52,16 +72,17 @@ const ROUTES = [
     validators: [],
   },
   {
+    //you can include request params like :id in the line below
     path: "/artwork/:id",
     method: "get",
     handler: getSingleArtwork,
-    validators: [validators.authenticationCheck],
+    validators: [],
   },
 ];
 
 app.use(
   util.createRoutes(ROUTES, {
-    // 👇 this is required to run the service, should probably not be and
+    // 👇 this is required to run the service, should probably not be or
     // should be logOptions
     logOpts: {
       version: VERSION_INFO,
@@ -83,36 +104,28 @@ function pingRoute(logger, { headers, body, query, params, reqInfo, raw }) {
     data: { version: VERSION_INFO, name: SERVICE_NAME },
   };
 }
-async function getUserRoute(
+
+async function createArtworkPurchase(
   logger,
   { headers, body, query, params, reqInfo, raw }
 ) {
-  logger.info("params", params);
-  const requestInfo = {
-    headers: {
-      "x-nb-fingerprint": headers["x-nb-fingerprint"],
-      "x-nb-token": headers["x-nb-token"],
-    },
-    url: USER_ENDPOINT + `/users/${params.id}`,
+  logger("createArtworkPurchase", body);
+  // Everything is this route is protected by the validator
+  // so online autherized people can for example create database options
+  //-----------------------------------------
+  // EXAMPLE: create a item in the mongo db
+  //-----------------------------------------
+  // databaseClient.purchases.insertOne({
+  //   item: body.item,
+  //   price: body.price,
+  //   quantity: body.quantity,
+  //   date: new Date(),
+  // });
+  //-----------------------------------------
+  return {
+    status: StatusCodes.OK,
+    data: body,
   };
-  logger.info("requestInfo", requestInfo);
-  try {
-    const getUser = await got(requestInfo).json();
-    // Onces the data is found, its "logged" to the console
-    // Logs can be viewed by clicking the Three dots and then "View Logs" in Nodeblocks Cloud Studio
-    return {
-      status: StatusCodes.OK,
-      data: getUser,
-    };
-  } catch (error) {
-    // All the Errors will be logged as well in the same location
-    logger.error(error);
-    // A simple error message will be returned to the requestor
-    return {
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      data: error.message,
-    };
-  }
 }
 
 async function getAllArtwork(
@@ -163,8 +176,8 @@ async function getSingleArtwork(
       id: data.id,
       title: data.title,
       images: {
-        full: utilities.getImageUrl(data.image_id, "full"),
-        small: utilities.getImageUrl(data.image_id, "small"),
+        full: `https://www.artic.edu/iiif/2/data.image_id/full/848,/0/default.jpg`,
+        small: `https://www.artic.edu/iiif/2/data.image_id/full/150,/0/default.jpg`,
       },
     };
 
