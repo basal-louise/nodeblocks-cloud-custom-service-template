@@ -100,6 +100,11 @@ function pingRoute(logger, { headers, body, query, params, reqInfo, raw }) {
   // its main purpose is an easy way to check the service is running and return version information
   logger.info("Ping Handler", reqInfo);
   return {
+    //Status is the response code and the StatusCodes util includes a bunch of useful codes
+    // For Example:
+    // StatusCodes.OK = 200
+    // StatusCodes.INTERNAL_SERVER_ERROR = 500
+    // StatusCodes.INTERNAL_SERVER_ERROR = 500
     status: StatusCodes.OK,
     data: { version: VERSION_INFO, name: SERVICE_NAME },
   };
