@@ -5,11 +5,9 @@ import _ from "lodash";
 import { util, app as nodeblocks, mongo } from "@basaldev/backend-sdk";
 import got from "got";
 
-// Config
 const { StatusCodes } = util;
 const SERVICE_NAME = "NODEBLOCKS_CUSTOM_SERVICE";
 const VERSION_INFO = "1.0.0";
-
 /**============================================
  *              Helper Functions
  *=============================================**/
@@ -46,10 +44,10 @@ const ROUTES = [
   },
   {
     path: "/purchase",
-    //method can be  'get' | 'post' | 'delete' | 'patch'
+    // method can be  'get' | 'post' | 'delete' | 'patch'
     method: "post",
     handler: createArtworkPurchase,
-    //This route includes a validator, easy to use function to help protect routes
+    // This route includes a validator, easy to use function to help protect routes
     // you can have as many as you like
     // authenticationCheck is in validators.js
     validators: [validators.authenticationCheck],
@@ -83,6 +81,7 @@ app.use(
 /**========================================================================
  *                           Route Handlers
  *========================================================================**/
+// These functions are referenced above and "handle" each url path's logic
 
 function pingRoute(logger, { headers, body, query, params, reqInfo, raw }) {
   // Ping is a standard route in most APIs
@@ -93,7 +92,7 @@ function pingRoute(logger, { headers, body, query, params, reqInfo, raw }) {
     // For Example:
     // StatusCodes.OK = 200
     // StatusCodes.INTERNAL_SERVER_ERROR = 500
-    // StatusCodes.INTERNAL_SERVER_ERROR = 500
+    // StatusCodes.NOT_FOUND = 404
     status: StatusCodes.OK,
     data: { version: VERSION_INFO, name: SERVICE_NAME },
   };
@@ -104,8 +103,8 @@ async function createArtworkPurchase(
   { headers, body, query, params, reqInfo, raw }
 ) {
   logger.info("createArtworkPurchase", body);
-  // Everything is this route is protected by the validator
-  // so online autherized people can for example create database options
+  // Everything is this route is protected by the validator in the "ROUTES" array above 
+  // below is an commented example of saving to a mongo database on this post endpoint
   //-----------------------------------------
   // EXAMPLE: create a item in the mongo db
   //-----------------------------------------
@@ -126,9 +125,10 @@ async function getAllArtwork(
   logger,
   { headers, body, query, params, reqInfo, raw }
 ) {
-  //this route requests all artwork from the API
+  // This route handler shows you how you could connect to an external API
+  // This API returns a list of fine art
   const allArtworkUrl = `https://api.artic.edu/api/v1/artworks`;
-  // the request is wrapped in a try statement to check all errors that might happen
+  // the request is wrapped in a try statement to catch all errors that might happen
   try {
     const artwork = await got({
       url: allArtworkUrl,
