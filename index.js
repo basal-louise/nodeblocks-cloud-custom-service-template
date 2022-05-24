@@ -103,7 +103,7 @@ async function createArtworkPurchase(
   logger,
   { headers, body, query, params, reqInfo, raw }
 ) {
-  logger("createArtworkPurchase", body);
+  logger.info("createArtworkPurchase", body);
   // Everything is this route is protected by the validator
   // so online autherized people can for example create database options
   //-----------------------------------------
