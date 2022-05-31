@@ -34,7 +34,6 @@ import * as validators from "./validators.js";
  *               Routes
  *=============================================**/
 // this array stores all the routes for your custom service
-// you can
 const ROUTES = [
   {
     path: "/ping",
