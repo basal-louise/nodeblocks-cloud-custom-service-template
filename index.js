@@ -15,10 +15,10 @@ const VERSION_INFO = "1.0.0";
 /**============================================
  *               Environment Variables
  *=============================================**/
-// the port the service will run on, node-block default is 8081
+// The port the service will run on. The default will be 8081
 const PORT = utilities.getEnvironmentVariable("PORT", 8081);
 
-// You can use this helper function to call any new environment variables and include a default value
+// You can use this helper function to get the value of an environment variable with a fallback value if it doesn't exist.
 // const MONGO_DB = utilities.getEnvironmentVariable(
 //   "MONGO_DB",
 //   "DEFAULT_MONGO_DB_CONNECTION_STRING"
