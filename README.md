@@ -83,3 +83,18 @@ Run the following command to start the application:
 npm start
 ```
 
+## 📌 Examples
+
+This template includes a simple todo feature to demonstrate how to create a custom service. Run the following command to start the example todo app:
+
+```bash
+npm run preview:todo
+```
+
+The todo feature includes the following endpoints:
+
+- `GET /todos` - Get all todos
+- `POST /todos` - Create a new todo
+- `GET /todos/:id` - Get a todo by id
+- `PUT /todos/:id` - Update a todo by id
+- `DELETE /todos/:id` - Delete a todo by id
