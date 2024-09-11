@@ -51,14 +51,25 @@ npm ci
 
 ## 💡 Usage
 
-### Building the service
+### Development
+
+Run the following command to start the application in development mode:
+
+```bash
+npm run dev
+```
+
+This command will start the application in development mode with hot reloading enabled. The application will automatically restart when you make changes to the code.
+
+### Building the service for the release
 
 Run the following command to build the code:
+
 ```bash
 npm run build
 ```
 
-You need to build the code before running the service to convert TypeScript code to runnable JavaScript. The transpiled code will be generated in the `dist` folder.
+You need to build the code before to convert TypeScript code to runnable JavaScript. The transpiled code will be generated in the `dist` folder.
 
 ### Running the service
 
