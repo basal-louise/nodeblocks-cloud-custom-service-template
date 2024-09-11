@@ -4,7 +4,7 @@
   "description": "a template for creating custom services in nodeblock cloud service",
   "main": "dist/index.js",
   "scripts": {
-    "start:dev": "dotenv node dist/index.js",
+    "start:dev": "node -r dotenv/config dist/index.js",
     "start": "node dist/index.js",
     "build": "tsc"
   },
@@ -16,6 +16,6 @@
     "typescript": "^5.5.4"
   },
   "devDependencies": {
-    "dotenv-cli": "^5.1.0"
+    "dotenv": "^16.4.5"
   }
 }
