@@ -49,6 +49,8 @@ Run the following commands to install the required dependencies:
 npm ci
 ```
 
+The dependencies includes `@basaldev/blocks-backend-sdk` which make easy to create the custom services.
+
 ## 💡 Usage
 
 ### Development
