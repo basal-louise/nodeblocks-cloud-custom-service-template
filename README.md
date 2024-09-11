@@ -33,13 +33,15 @@ Please prepare this token using the steps below before continuing with setup.
 export BASALDEV_AUTH_TOKEN=__INSERT_YOUR_TOKEN_HERE__
 ```
 
-### Create .env file
+### Create .env file for the development
 
 Create a `.env` file in the root of the project by copying the `.env.default` file. Update the values in the `.env` file with the actual values.
 
 ```bash
 cp .env.default .env
 ```
+
+This files is used for `npm run dev` command to run the service locally. You can configure the actual environment variables on NBC for the production.
 
 ### Install Dependencies
 
