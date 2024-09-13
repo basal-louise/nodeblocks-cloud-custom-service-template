@@ -1,35 +1,49 @@
 import {
   route,
   BunyanLoggerFactory,
-  app as backendSdkApp
+  app as backendSdkApp,
+  util
 } from '@basaldev/blocks-backend-sdk';
 
-// get envvars
-// you can access the configs from NBC via process.env as well
-const port = process.env.PORT as unknown as number ?? 8080;
+/**
+ * Retrieve environment variables
+ * 
+ * You can access the configs from NBC via process.env as well
+ */
+const port = Number(process.env.PORT ?? 8080);
 const env = process.env.NODE_ENV  as 'production' | 'development' ?? 'production';
   
-// create logger
-const logger = new BunyanLoggerFactory({
+/**
+ * Create a logger
+ */
+const loggerFactory = new BunyanLoggerFactory({
   env, 
   name: '<your service name>',
   port,
-}).createLogger();
-  
-// create db connection
-const todos = [
-  { id: 1, content: 'entry 1' },
-  { id: 2, content: 'entry 2' },
-  { id: 3, content: 'entry 3' }
- ];
-  
-// create nodeblocks app
+})
+const logger = loggerFactory.createLogger();
+
+/**
+ * Create a nodeblocks app
+ */
 const app = backendSdkApp.createNodeblocksApp({});
 
-// create routes
-// https://docs.nodeblocks.dev/docs/how-tos/customization/customizing-adapters#adding-new-api-endpoints
+/**
+ * Define routes
+ * 
+ * https://docs.nodeblocks.dev/docs/how-tos/customization/customizing-adapters#adding-new-api-endpoints
+ */
 const routes = [
-  // List todos
+  /**
+   * Define a route to list entries
+   * GET /todos
+   * 
+   * You can define other routes like:
+   * - GET /todos/:todoId
+   * - POST /todos
+   * - PATCH /todos/:todoId
+   * - DELETE /todos/:todoId
+   */
   route.createRoute({
     method: 'get',
     path: '/todos',
@@ -37,36 +51,38 @@ const routes = [
     handler: async (logger, context) => {
       logger.info('Getting todos...');
       return {
-        data: todos,
-        status: 200
+        data: [
+          { id: 1, content: 'entry 1' },
+          { id: 2, content: 'entry 2' },
+          { id: 3, content: 'entry 3' }
+        ],
+        status: util.StatusCodes.OK
       }
     },
   }),
-  // GET /todos/:todoId
-  // POST /toods
-  // PATCH /todos/:todoId
-  // DELETE /todos/:todoId
 ];
 
-const options = {
-  adapterName: '',
-  loggerFactory: new BunyanLoggerFactory({
-    env, 
-    name: '<your service name>',
-    port,
-  }),
-}
-  
-// register routes
+/**
+ * Register routes
+ */
 app.use(
-  route.createRoutes(routes, options)
+  route.createRoutes(routes, {
+    adapterName: 'NONE',
+    loggerFactory
+  })
 );
 
- // start service
+/**
+ * Start the server
+ */
 logger.info('🔄 Starting…');
-const server = app.listen(port, () => {
+app.listen(port, () => {
   logger.info(`🚀 Now listening on port ${port}`);
 });
+
+/**
+ * Handle shutdown
+ */
 process.on('SIGINT', () => {
   logger.info('🚪 Shutting down…');
   process.exit();
