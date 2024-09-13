@@ -41,7 +41,7 @@ Create a `.env` file in the root of the project by copying the `.env.default` fi
 cp .env.default .env
 ```
 
-This files is used for `npm run dev` command to run the service locally. You can configure the actual environment variables on NBC for the production.
+This file is used for `npm run dev` command to run the service locally. You can configure the actual environment variables on NBC for production.
 
 ### Install Dependencies
 

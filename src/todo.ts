@@ -193,7 +193,7 @@ function createRoutes(todoRepository: TodoRepository) {
     ],
     handler: async (logger, context) => {
       try {
-        logger.info('Updating todo todo by id...');
+        logger.info('Updating todo by id...');
         const { id } = await todoRepository.update(context.params.todoId, { content: context.body.content });
         const todo = await todoRepository.findOne(id);
         return {
