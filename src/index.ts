@@ -35,6 +35,22 @@ const app = backendSdkApp.createNodeblocksApp({});
  */
 const routes = [
   /**
+   * Define a route for health check
+   * GET /ping
+   */
+  route.createRoute({
+    method: 'get',
+    path: '/ping',
+    validators: [],
+    handler: async (logger, context) => {
+      logger.info('Pinging...');
+      return {
+        data: 'OK',
+        status: util.StatusCodes.OK
+      }
+    },
+  }),
+  /**
    * Define a route to list entries
    * GET /todos
    * 
