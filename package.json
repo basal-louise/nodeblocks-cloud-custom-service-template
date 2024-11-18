@@ -2,7 +2,7 @@
   "name": "nodeblocks-cloud-custom-service-template",
   "version": "1.0.0",
   "description": "a template for creating custom services in nodeblock cloud service",
-  "main": "dist/index.js",
+  "main": "build-folder/index.js",
   "scripts": {
     "start": "node dist/index.js",
     "preview:todo": "npx tsx -r dotenv/config src/todo.ts",
