@@ -3,7 +3,7 @@
     "src/**/*",
   ],
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "build-folder",
     "skipLibCheck": true,
     "esModuleInterop": true,
   }
